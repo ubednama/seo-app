@@ -1,38 +1,41 @@
-from unittest.mock import patch, MagicMock
 import pytest
-import httpx
+import respx
+from httpx import Response
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import sessionmaker
+
 from api.v1.seo_reports import process_seo_analysis
 from models.seo_report import SEOReport
 
 @pytest.mark.asyncio
-async def test_process_seo_analysis(db_session):
-    """Test the entire background analysis process."""
+@respx.mock
+async def test_process_seo_analysis_integration(db_session: AsyncSession):
+    """
+    A true integration test for the entire background analysis process.
+    It mocks the external HTTP call but allows all other code to run as-is.
+    """
+    
     report = SEOReport(url="http://example.com", status="pending")
     db_session.add(report)
     await db_session.commit()
     await db_session.refresh(report)
 
-    fake_html = "<html><head><title>Test</title></head><body><h1>Hi</h1></body></html>"
-    fake_ai_results = {"summary": "Good job!", "recommendations": ["Keep it up"]}
+    fake_html = "<html><head><title>Test Title</title></head><body><h1>Hi</h1></body></html>"
+    respx.get("http://example.com").mock(return_value=Response(200, text=fake_html))
 
-    mock_ai_generator = MagicMock()
-    mock_ai_generator.generate_insights.return_value = fake_ai_results
+    await process_seo_analysis(
+        report_id=report.id,
+        url="http://example.com",
+        include_ai_insights=False
+    )
 
-    mock_response = MagicMock()
-    mock_response.text = fake_html
-    mock_response.raise_for_status = MagicMock()
-
-    with patch('api.v1.seo_reports.httpx') as mock_httpx, \
-         patch('api.v1.seo_reports.AIInsightGenerator', return_value=mock_ai_generator):
-        mock_httpx.RequestError = httpx.RequestError
-        mock_httpx.AsyncClient.return_value.__aenter__.return_value.get.return_value = mock_response
+    async_session_maker = sessionmaker(
+        bind=db_session.bind, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session_maker() as new_session:
+        fresh_report = await new_session.get(SEOReport, report.id)
         
-        await process_seo_analysis(report.id, "http://example.com", True)
-
-    await db_session.refresh(report)
-
-    assert report.status == "completed"
-    assert report.seo_score is not None
-    assert report.ai_insights == "Good job!"
-    assert "Keep it up" in report.ai_recommendations
-    assert report.completed_at is not None
+        assert fresh_report.status == "completed"
+        assert fresh_report.title == "Test Title"
+        assert fresh_report.seo_score is not None

@@ -50,13 +50,9 @@ app = FastAPI(
     3. Generate PDF reports for stakeholders
     4. Track historical performance over time
     """,
-    docs_url=f"{settings.API_V1_STR}/docs",
-    redoc_url=f"{settings.API_V1_STR}/redoc",
-    openapi_url=f"{settings.API_V1_STR}/openapi.json",
-    contact={
-        "name": "Madeline & Co. SiteSage Support",
-        "email": "support@sitesage.com",
-    },
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     license_info={
         "name": "MIT License",
         "url": "https://opensource.org/licenses/MIT",

@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     
     DATABASE_URL: str = os.getenv("DATABASE_URL")
+    TEST_DATABASE_URL: str = os.getenv("TEST_DATABASE_URL")
     
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")

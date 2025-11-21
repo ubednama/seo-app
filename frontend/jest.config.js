@@ -10,6 +10,7 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
+    '^react-markdown$': '<rootDir>/__mocks__/react-markdown.js',
     '^@/(.*)$': '<rootDir>/$1',
   },
   testMatch: [
@@ -35,8 +36,7 @@ const customJestConfig = {
   },
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
   transformIgnorePatterns: [
-    '/node_modules/',
-    '^.+\\.module\\.(css|sass|scss)$'
+    '/node_modules/(?!react-markdown)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
 }

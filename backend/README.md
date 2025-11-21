@@ -15,26 +15,9 @@ The backend is responsible for the following core features:
 
 - **Framework:** FastAPI
 - **Language:** Python
-- **AI Orchestration:** LangChain
+- **AI Orchestration:** LangChain (with Google Gemini)
 - **Database:** PostgreSQL with Alembic for migrations
 - **Testing:** Pytest
-
-## Implemented Features
-
-- **Modular Architecture:** The codebase is organized into a modular structure, separating concerns between API endpoints, services, and database models.
-- **Asynchronous Task Processing:** SEO analysis is handled asynchronously using `BackgroundTasks` to ensure the API remains responsive.
-- **AI-Powered Insights:** The `AIInsightGenerator` service integrates with Google's Gemini models via LangChain to generate a qualitative summary and actionable recommendations based on the raw SEO data.
-- **Custom PDF Reporting:** The `get_report_pdf` endpoint generates a downloadable PDF report of the SEO analysis, with a dynamically generated filename based on the analyzed URL.
-- **Database Migrations:** Alembic is configured to manage database schema changes.
-- **Error Handling and Logging:** The application includes structured logging and error handling to provide insights into runtime issues.
-
-## Features Not Yet Implemented
-
-- **User Authentication and Authorization:** The current implementation does not include user accounts or role-based access control.
-- **Historical Report Tracking:** While the database schema includes fields for tracking changes over time, the API does not yet expose endpoints for historical data analysis.
-- **Batch URL Analysis:** The API does not yet support the submission of multiple URLs for analysis in a single request.
-- **CI/CD Pipeline:** A continuous integration and deployment pipeline has not yet been set up.
-- **Containerization:** Docker and Docker Compose have not yet been configured for the project.
 
 ## Getting Started
 
@@ -44,27 +27,39 @@ To run the backend service locally, follow these steps:
 
     ```bash
     git clone <repository-url>
-    cd <repository-directory>
+    cd seo-app
     ```
 
 2. **Install dependencies:**
 
     ```bash
-    pip install -r requirements.txt
+    pip install -r backend/requirements.txt
+    pip install -r backend/requirements-dev.txt
     ```
 
 3. **Set up the environment:**
 
-    Create a `.env` file in the root of the backend directory and add the following environment variables:
+    Create a `.env` file in the root of the project directory (`seo-app/.env`) and add the following environment variables:
 
-    ```
-    GOOGLE_API_KEY="your-google-api-key"
-    DATABASE_URL="postgresql://user:password@host:port/database"
+    ```text
+    # backend/core/config.py
+    PROJECT_NAME="SiteSage API"
+    API_V1_STR="/api/v1"
+    
+    # Database settings
+    DATABASE_URL="postgresql+asyncpg://user:password@host:port/database"
+    TEST_DATABASE_URL="postgresql+asyncpg://user:password@host:port/test_database"
+
+    # AI settings
+    GEMINI_API_KEY="your-gemini-api-key"
     ```
 
 4. **Run database migrations:**
 
+    Navigate to the backend directory and run the following command:
+
     ```bash
+    cd backend
     alembic upgrade head
     ```
 
@@ -78,4 +73,48 @@ The API will be available at `http://localhost:8000`.
 
 ## API Documentation
 
-Once the server is running, you can access the interactive API documentation at `http://localhost:8000/docs`.
+Once the server is running, you can access the interactive API documentation at the following URLs:
+
+- **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+The OpenAPI schema is available at `http://localhost:8000/openapi.json`.
+
+## Endpoints
+
+The primary endpoint for analyzing a URL is:
+
+- `POST /api/v1/seo-reports/`
+
+    **Request Body:**
+
+    ```json
+    {
+      "url": "https://example.com",
+      "include_ai_insights": true
+    }
+    ```
+
+    **Response:**
+
+    ```json
+    {
+      "id": 1,
+      "url": "https://example.com",
+      "status": "pending",
+      "created_at": "2023-10-27T10:00:00Z"
+    }
+    ```
+
+You can then retrieve the report using its ID:
+
+- `GET /api/v1/seo-reports/{report_id}`
+
+## Running Tests
+
+To run the test suite, navigate to the `backend` directory and run `pytest`:
+
+```bash
+cd backend
+pytest
+```
