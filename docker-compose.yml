@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sitesage
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d sitesage"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env  # Reads GOOGLE_API_KEY from your root .env file
+    environment:
+      # Override local DB URL with the Docker container URL
+      DATABASE_URL: postgresql+asyncpg://user:password@db:5432/sitesage
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Passes this to the Dockerfile during 'npm run build'
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
