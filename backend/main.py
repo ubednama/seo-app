@@ -1,10 +1,10 @@
+import json
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from core.config import settings
 from core.database import engine, Base
 from api.v1 import seo_reports
-
-
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -67,22 +67,23 @@ app = FastAPI(
     ],
 )
 
+origins_str = os.getenv("ALLOWED_ORIGINS", '["http://localhost:3000", "http://127.0.0.1:3000"]')
+
+try:
+    allow_origins = json.loads(origins_str)
+except json.JSONDecodeError:
+    allow_origins = ["http://localhost:3000"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Next.js development
-        "https://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://127.0.0.1:3000",
-    ],
+    allow_origins=allow_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
 
 app.include_router(seo_reports.router, prefix=f"{settings.API_V1_STR}/seo-reports", tags=["seo-reports"])
-
 @app.get("/")
 async def root():
     return {"message": "SEO Performance Analyzer API", "version": "1.0.0"}

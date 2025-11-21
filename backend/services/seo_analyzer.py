@@ -35,7 +35,6 @@ class SEOAnalyzer:
         soup = BeautifulSoup(html_content, 'lxml')
         score = 100
         
-        # 1. Title Analysis
         title_tag = soup.find('title')
         title_text = ""
         if not title_tag or not title_tag.string:
@@ -46,7 +45,6 @@ class SEOAnalyzer:
             if len(title_text) > 60 or len(title_text) < 10:
                 score -= 10
 
-        # 2. Meta Description Analysis
         meta_tag = soup.find('meta', attrs={'name': 'description'})
         meta_description_text = ""
         if not meta_tag or not meta_tag.get('content'):
@@ -55,7 +53,6 @@ class SEOAnalyzer:
         else:
             meta_description_text = meta_tag.get('content', '').strip()
 
-        # 3. Heading Analysis
         h1_tags = soup.find_all('h1')
         h1_count = len(h1_tags)
         if h1_count == 0:
@@ -66,7 +63,6 @@ class SEOAnalyzer:
         h2_tags = soup.find_all('h2')
         h2_count = len(h2_tags)
 
-        # 4. Image Alt Text Analysis
         images = soup.find_all('img')
         image_count = len(images)
         missing_alt_count = 0
@@ -79,7 +75,6 @@ class SEOAnalyzer:
                     score -= 5
                     alt_penalty += 5
         
-        # 5. Link Analysis
         internal_links_count = 0
         external_links_count = 0
         parsed_url = urlparse(url)
@@ -93,13 +88,11 @@ class SEOAnalyzer:
                 external_links_count += 1
 
 
-        # 6. Load Time Analysis
         load_time_status = "pass"
         if response_time_ms > 2000:
             score -= 15
             load_time_status = "fail"
 
-        # Ensure score is not negative
         final_score = max(0, score)
 
         return {

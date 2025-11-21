@@ -27,7 +27,6 @@ class AIInsightGenerator:
             if not api_key:
                 raise ValueError("API Key is missing or empty.")
             
-            # Updated model to standard 'gemini-1.5-flash' which is robust for free tier
             self.model = ChatGoogleGenerativeAI(
                 model=model_name,
                 google_api_key=api_key, 
@@ -60,10 +59,8 @@ class AIInsightGenerator:
             return self._get_fallback_response("AI Insight Generator not initialized.")
 
         try:
-            # Convert the metrics dictionary to a JSON string for clear prompting
             metrics_str = json.dumps(metrics, indent=2)
             
-            # Invoke the LangChain to get the structured output
             result = self.chain.invoke({
                 "metrics": metrics_str,
                 "format_instructions": self.parser.get_format_instructions()
@@ -82,6 +79,6 @@ class AIInsightGenerator:
             "recommendations": [
                 "Please try again later.",
                 "Verify API key configuration.",
-                f"Error: {error_message[:100]}..." # Return partial error to UI for debugging
+                f"Error: {error_message[:100]}..."
             ]
         }

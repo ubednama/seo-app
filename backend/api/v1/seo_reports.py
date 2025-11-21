@@ -26,10 +26,9 @@ from schemas.seo_report import (
 )
 from services.ai_insights import AIInsightGenerator
 from services.pdf_generator import generate_report_pdf
+from core.database import SessionLocal
 
-# --- Settings Configuration ---
-# We try to import settings from core.config. 
-# If that fails, we load them directly here to ensure the API Key is found.
+
 try:
     from core.config import settings
 except ImportError:
@@ -52,7 +51,6 @@ async def analyze_url(
     Submit a URL for comprehensive SEO analysis.
     """
     try:
-        # Check if recent analysis exists
         result = await db.execute(
             select(SEOReport).filter(
                 SEOReport.url == str(request.url),
@@ -68,7 +66,6 @@ async def analyze_url(
                 message="Analysis completed successfully"
             )
         
-        # Create new report
         report = SEOReport(
             url=str(request.url),
             status="pending"
@@ -77,13 +74,11 @@ async def analyze_url(
         await db.commit()
         await db.refresh(report)
         
-        # Process analysis in background
         background_tasks.add_task(
             process_seo_analysis,
             report.id,
             str(request.url),
             request.include_ai_insights,
-            db
         )
         
         return SEOAnalysisResponse(
@@ -143,82 +138,83 @@ async def list_reports(
 async def process_seo_analysis(
     report_id: int,
     url: str,
-    include_ai_insights: bool,
-    db: Session
+    include_ai_insights: bool
 ):
     """
     Asynchronously process a URL to perform SEO analysis.
+    Uses its own independent DB session.
     """
-    result = await db.execute(select(SEOReport).filter(SEOReport.id == report_id))
-    report = result.scalars().first()
-    if not report:
-        logger.error(f"Report with ID {report_id} not found.")
-        return
+    async with SessionLocal() as db:
+        try:
+            result = await db.execute(select(SEOReport).filter(SEOReport.id == report_id))
+            report = result.scalars().first()
 
-    report.status = "processing"
-    await db.commit()
+            if not report:
+                logger.error(f"Report with ID {report_id} not found in background task.")
+                return
 
-    try:
-        # Step 1: Fetch URL content
-        start_time = time.time()
-        async with httpx.AsyncClient() as client:
-            # Pretend to be a real browser to avoid 403s
-            headers = {'User-Agent': 'Mozilla/5.0 (compatible; SiteSage/1.0)'}
-            response = await client.get(url, headers=headers, follow_redirects=True, timeout=30)
-            response.raise_for_status()
-            html_content = response.text
-            response_time_ms = int((time.time() - start_time) * 1000)
+            report.status = "processing"
+            await db.commit()
 
-        # Step 2: Analyze the content
-        analyzer = SEOAnalyzer()
-        analysis_results = analyzer.analyze(html_content, response_time_ms, url)
+            try:
+                start_time = time.time()
+                async with httpx.AsyncClient() as client:
+                    headers = {'User-Agent': 'Mozilla/5.0 (compatible; SiteSage/1.0)'}
+                    response = await client.get(url, headers=headers, follow_redirects=True, timeout=30)
+                    response.raise_for_status()
+                    html_content = response.text
+                    response_time_ms = int((time.time() - start_time) * 1000)
 
-        # Step 3: Generate AI insights (FIXED LOGIC)
-        ai_summary = None
-        ai_recommendations = None
-        
-        if include_ai_insights:
-            model_name = settings.MODEL_NAME if hasattr(settings, 'MODEL_NAME') else 'gemini-1.5-flash'
-            api_key = settings.GOOGLE_API_KEY
-            
-            if api_key:
-                try:
-                    ai_generator = AIInsightGenerator(api_key=api_key, model_name=model_name)
-                    ai_results = ai_generator.generate_insights(analysis_results)
-                    ai_summary = ai_results.get('summary')
-                    ai_recommendations = ai_results.get('recommendations')
-                except Exception as e:
-                    logger.error(f"AI Generation failed: {e}")
-                    ai_summary = "AI analysis failed during generation."
-            else:
-                logger.warning("GOOGLE_API_KEY missing in settings. Skipping AI.")
-                ai_summary = "AI Configuration missing (API Key)."
+                analyzer = SEOAnalyzer()
+                analysis_results = analyzer.analyze(html_content, response_time_ms, url)
 
-        # Step 4: Save results
-        report.status = "completed"
-        report.completed_at = datetime.now(timezone.utc)
-        report.seo_score = analysis_results.get('score')
-        report.raw_metrics = json.dumps(analysis_results)
-        report.ai_insights = ai_summary
-        report.ai_recommendations = ai_recommendations
-        
-        report.title = analysis_results.get('title')
-        report.meta_description = analysis_results.get('meta_description')
-        report.load_time = response_time_ms / 1000.0 
+                ai_summary = None
+                ai_recommendations = None
+                
+                if include_ai_insights:
+                    model_name = settings.MODEL_NAME if hasattr(settings, 'MODEL_NAME') else 'gemini-1.5-flash'
+                    api_key = settings.GOOGLE_API_KEY
+                    
+                    if api_key:
+                        try:
+                            ai_generator = AIInsightGenerator(api_key=api_key, model_name=model_name)
+                            ai_results = ai_generator.generate_insights(analysis_results)
+                            ai_summary = ai_results.get('summary')
+                            ai_recommendations = ai_results.get('recommendations')
+                        except Exception as e:
+                            logger.error(f"AI Generation failed: {e}")
+                            ai_summary = "AI analysis failed during generation."
+                    else:
+                        logger.warning("GOOGLE_API_KEY missing in settings. Skipping AI.")
+                        ai_summary = "AI Configuration missing (API Key)."
 
-        await db.commit()
-        logger.info(f"Successfully processed and saved report for {url}")
+                report.status = "completed"
+                report.completed_at = datetime.now(timezone.utc)
+                report.seo_score = analysis_results.get('score')
+                report.raw_metrics = json.dumps(analysis_results)
+                report.ai_insights = ai_summary
+                report.ai_recommendations = ai_recommendations
+                
+                report.title = analysis_results.get('title')
+                report.meta_description = analysis_results.get('meta_description')
+                report.load_time = response_time_ms / 1000.0 
 
-    except httpx.RequestError as e:
-        logger.error(f"HTTP fetch failed for {url}: {e}")
-        report.status = "failed"
-        report.error_message = f"Failed to fetch URL: {e}"
-        await db.commit()
-    except Exception as e:
-        logger.error(f"Unexpected error for {url}: {e}")
-        report.status = "failed"
-        report.error_message = f"An unexpected error occurred: {str(e)}"
-        await db.commit()
+                await db.commit()
+                logger.info(f"Successfully processed and saved report for {url}")
+
+            except httpx.RequestError as e:
+                logger.error(f"HTTP fetch failed for {url}: {e}")
+                report.status = "failed"
+                report.error_message = f"Failed to fetch URL: {str(e)}"
+                await db.commit()
+            except Exception as e:
+                logger.error(f"Unexpected error during analysis for {url}: {e}")
+                report.status = "failed"
+                report.error_message = f"An unexpected error occurred: {str(e)}"
+                await db.commit()
+                
+        except Exception as outer_e:
+            logger.error(f"Critical DB error in background task: {outer_e}")
 
 @router.get("/{report_id}/pdf")
 async def get_report_pdf(report_id: int, db: Session = Depends(get_db)):
@@ -233,7 +229,6 @@ async def get_report_pdf(report_id: int, db: Session = Depends(get_db)):
     if report.status != "completed":
         raise HTTPException(status_code=400, detail="Report analysis is still in progress or failed.")
 
-    # Prepare data for the PDF generator
     try:
         raw_metrics = json.loads(report.raw_metrics) if report.raw_metrics else {}
     except json.JSONDecodeError:
@@ -249,10 +244,8 @@ async def get_report_pdf(report_id: int, db: Session = Depends(get_db)):
         "created_at": report.created_at
     }
 
-    # Generate PDF
     pdf_bytes = generate_report_pdf(analysis_data)
 
-    # --- FIXED FILENAME LOGIC ---
     def sanitize_filename(name: str) -> str:
         """
         Robust sanitization for filenames:
@@ -263,16 +256,12 @@ async def get_report_pdf(report_id: int, db: Session = Depends(get_db)):
         if not name:
             return "report"
             
-        # Normalize unicode (e.g. "Google ■ Gemini" -> "Google  Gemini")
         normalized = unicodedata.normalize('NFKD', name)
         
-        # Encode to ASCII and ignore errors to strip weird chars
         ascii_name = normalized.encode('ascii', 'ignore').decode('ascii')
         
-        # Replace invalid chars
         s = re.sub(r'[\\/:*?"<>|\s]+', '_', ascii_name)
         
-        # Collapse underscores
         s = re.sub(r'_+', '_', s)
         s = s.strip('_')
         
@@ -330,7 +319,7 @@ async def batch_analyze_urls(
                 report.id,
                 url,
                 include_ai_insights,
-                db
+                # db
             )
         
         return {

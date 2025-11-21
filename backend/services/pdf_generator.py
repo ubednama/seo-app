@@ -22,7 +22,6 @@ def generate_report_pdf(analysis_data: dict) -> bytes:
     )
     styles = getSampleStyleSheet()
 
-    # --- Custom Styles ---
     styles.add(ParagraphStyle(name='BodyTextLeft', parent=styles['Normal'], alignment=TA_LEFT, leading=14))
     
     styles.add(ParagraphStyle(
@@ -55,7 +54,6 @@ def generate_report_pdf(analysis_data: dict) -> bytes:
     
     # --- Score Logic ---
     score = analysis_data.get('seo_score', 0)
-    # Handle NoneType if score is missing
     if score is None: 
         score = 0
         
@@ -75,16 +73,12 @@ def generate_report_pdf(analysis_data: dict) -> bytes:
     
     story = []
 
-    # 1. Header
     story.append(Paragraph("SiteSage SEO Report", styles['ReportHeader']))
     story.append(Paragraph(f"URL: {analysis_data.get('url', 'N/A')}", styles['SubHeader']))
     story.append(Paragraph(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['SubHeader']))
 
-    # 2. SEO Score
     story.append(Paragraph(str(score), score_style))
 
-    # 3. Executive Summary
-    # FIX: API sends 'ai_insights', not 'ai_summary'
     story.append(Paragraph("Executive Summary", styles['SectionHeader']))
     summary_text = analysis_data.get('ai_insights')
     if not summary_text:
@@ -92,11 +86,9 @@ def generate_report_pdf(analysis_data: dict) -> bytes:
     story.append(Paragraph(str(summary_text), styles['BodyTextLeft'])) 
     story.append(Spacer(1, 12))
 
-    # 4. Key Metrics
     story.append(Paragraph("Key Metrics", styles['SectionHeader']))
     raw_metrics = analysis_data.get('raw_metrics', {})
     
-    # --- Helper to safely get counts ---
     def get_count(key_count, key_list):
         val = raw_metrics.get(key_count)
         if val is not None: return val
@@ -106,16 +98,14 @@ def generate_report_pdf(analysis_data: dict) -> bytes:
 
     h1_count = get_count('h1_count', 'h1_tags')
     h2_count = get_count('h2_count', 'h2_tags')
-    img_missing_alt = get_count('images_missing_alt', 'images_without_alt') # Adjust key based on your analyzer
+    img_missing_alt = get_count('images_missing_alt', 'images_without_alt')
 
-    # --- Table Layout ---
     page_width = letter[0] - 72 * 2 
     col_widths = [page_width * 0.35, page_width * 0.65] 
 
     def make_value_paragraph(text):
         return Paragraph(str(text), styles['BodyTextLeft'])
 
-    # Prepare load time
     load_time_sec = analysis_data.get('load_time')
     load_time_ms = f"{load_time_sec * 1000:.0f}" if load_time_sec else "N/A"
 
@@ -148,7 +138,6 @@ def generate_report_pdf(analysis_data: dict) -> bytes:
     story.append(table)
     story.append(Spacer(1, 24))
 
-    # 5. Recommendations
     story.append(Paragraph("AI Recommendations", styles['SectionHeader']))
     recommendations = analysis_data.get('ai_recommendations')
     

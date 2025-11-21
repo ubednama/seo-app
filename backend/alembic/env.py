@@ -11,23 +11,15 @@ from alembic import context
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
-# Import your project settings and models
 from core.config import settings
 from core.database import Base
-# Import all models here so autogenerate detects them
 from models.seo_report import SEOReport
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
@@ -57,7 +49,6 @@ async def run_async_migrations() -> None:
     configuration = config.get_section(config.config_ini_section)
     configuration["sqlalchemy.url"] = settings.DATABASE_URL
 
-    # Creates an ASYNC engine
     connectable = async_engine_from_config(
         configuration,
         prefix="sqlalchemy.",
@@ -65,7 +56,6 @@ async def run_async_migrations() -> None:
     )
 
     async with connectable.connect() as connection:
-        # Bridges the Async world to the Sync Alembic world
         await connection.run_sync(do_run_migrations)
 
     await connectable.dispose()

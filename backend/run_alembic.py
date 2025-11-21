@@ -18,7 +18,6 @@ def main():
     
     try:
         if cmd == "revision":
-            # Parse arguments manually for revision command
             autogenerate = "--autogenerate" in sys.argv
             message = None
             if "-m" in sys.argv:

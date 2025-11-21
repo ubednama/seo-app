@@ -3,7 +3,11 @@ from typing import Optional
 import os
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=("../.env", ".env"), case_sensitive=True)
+    model_config = SettingsConfigDict(
+        env_file=("../.env", ".env"), 
+        case_sensitive=True,
+        extra="ignore"
+    )
 
     PROJECT_NAME: str = "SEO Performance Analyzer Backend"
     VERSION: str = "1.0.0"
@@ -17,5 +21,7 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
     MODEL_NAME: str = os.getenv("MODEL_NAME", "gemini-2.5-flash")
+
+    ALLOWED_ORIGINS: str = '["http://localhost:3000"]' 
     
 settings = Settings()
