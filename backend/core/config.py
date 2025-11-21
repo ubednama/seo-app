@@ -3,7 +3,7 @@ from typing import Optional
 import os
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file="../.env", case_sensitive=True)
+    model_config = SettingsConfigDict(env_file=("../.env", ".env"), case_sensitive=True)
 
     PROJECT_NAME: str = "SEO Performance Analyzer Backend"
     VERSION: str = "1.0.0"
