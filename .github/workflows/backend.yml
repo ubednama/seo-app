@@ -50,7 +50,7 @@ jobs:
 
       - name: Run tests with coverage
         env:
-          DATABASE_URL: "postgresql://testuser:testpassword@localhost:5432/test_db"
+          DATABASE_URL: "postgresql+asyncpg://testuser:testpassword@localhost:5432/test_db"
         run: pytest --cov=app --cov-report=term-missing
 
       - name: Deploy to Render
