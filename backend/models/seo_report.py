@@ -22,6 +22,7 @@ class SEOReport(Base):
     ai_recommendations = Column(JSON)
     status = Column(String(50), default="pending")  # pending, processing, completed, failed
     error_message = Column(Text)
+    completed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

@@ -34,4 +34,4 @@ async def test_get_pdf_report(async_client: AsyncClient, db_session):
     response = await async_client.get(f"/api/v1/seo-reports/{report.id}/pdf")
     assert response.status_code == 200
     assert response.headers["content-type"] == "application/pdf"
-    assert response.headers["content-disposition"] == f'attachment; filename="report-{report.id}.pdf"'
+    assert response.headers["content-disposition"] == f'attachment; filename="example.com.pdf"'

@@ -27,7 +27,7 @@ async def test_process_seo_analysis(db_session):
         mock_httpx.RequestError = httpx.RequestError
         mock_httpx.AsyncClient.return_value.__aenter__.return_value.get.return_value = mock_response
         
-        await process_seo_analysis(report.id, "http://example.com", True, db_session)
+        await process_seo_analysis(report.id, "http://example.com", True)
 
     await db_session.refresh(report)
 
