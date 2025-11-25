@@ -63,7 +63,7 @@ app = FastAPI(
     ],
 )
 
-origins_str = os.getenv("ALLOWED_ORIGINS", '["http://localhost:3000", "http://127.0.0.1:3000"]')
+origins_str = settings.ALLOWED_ORIGINS
 
 try:
     allow_origins = json.loads(origins_str)
