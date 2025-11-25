@@ -6,6 +6,8 @@ import ReportsTable from '@/components/seo/ReportsTable'
 import ReportsGrid from '@/components/seo/ReportsGrid'
 import { useSEOReports } from '@/lib/hooks/useSEOReports'
 import LoadingSpinner from '@/components/layout/LoadingSpinner'
+import Card from '@/components/ui/Card'
+import { FileText } from 'lucide-react'
 
 export default function HomePage() {
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table')
@@ -25,71 +27,69 @@ export default function HomePage() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Reports</h2>
-        <p className="text-gray-600 mb-6">{error.message}</p>
+      <Card className="text-center py-12 max-w-lg mx-auto">
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Error Loading Reports</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">{error.message}</p>
         <button
           onClick={() => refetch()}
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          className="px-6 py-3 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all shadow-lg hover:scale-105"
         >
           Try Again
         </button>
-      </div>
+      </Card>
     )
   }
 
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header Section */}
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          SEO Performance Analyzer
+      <div className="text-center py-8">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 animate-slide-up">
+          <span className="gradient-text">SEO Performance Analyzer</span>
         </h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto animate-slide-up">
           Analyze your website&apos;s SEO performance with AI-powered insights and actionable recommendations.
         </p>
       </div>
 
       {/* URL Submission Form */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+      <Card className="p-6 sm:p-8 animate-slide-up">
+        <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
           Submit Website for Analysis
         </h2>
         <URLSubmissionForm onSuccess={handleNewReport} />
-      </div>
+      </Card>
 
       {/* Reports Section */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800">
+      <Card className="p-6 sm:p-8 animate-slide-up">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             Analysis Reports
           </h2>
-          <div className="flex items-center space-x-4">
-            <div className="flex bg-gray-100 rounded-lg p-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+            <div className="flex glass-sm rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'table'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'table'
+                    ? 'bg-gradient-to-r from-primary-600 to-purple-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                  }`}
               >
                 Table View
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`flex-1 sm:flex-none px-4 py-2 rounded-md text-sm font-medium transition-all ${viewMode === 'grid'
+                    ? 'bg-gradient-to-r from-primary-600 to-purple-600 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                  }`}
               >
                 Grid View
               </button>
             </div>
             <button
               onClick={() => refetch()}
-              className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+              className="px-4 py-2 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all text-sm font-medium shadow-lg hover:scale-105"
             >
               Refresh
             </button>
@@ -103,21 +103,19 @@ export default function HomePage() {
             <ReportsGrid reports={reports.reports} />
           )
         ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
+          <div className="text-center py-16 animate-fade-in">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full glass-sm mb-6">
+              <FileText className="w-10 h-10 text-gray-400 dark:text-gray-600" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
               No Reports Yet
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
               Submit a website URL above to get started with your first SEO analysis.
             </p>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }

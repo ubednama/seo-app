@@ -20,16 +20,16 @@ export default function URLSubmissionForm({ onSuccess }: URLSubmissionFormProps)
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true)
-    
+
     try {
       const result = await submitURLForAnalysis(data.url)
-      
+
       if (result.status === 'processing') {
         toast.success('Analysis started! Check back in a few moments.')
       } else if (result.status === 'completed') {
         toast.success('Analysis completed successfully!')
       }
-      
+
       reset()
       onSuccess?.()
     } catch (error) {
@@ -44,14 +44,14 @@ export default function URLSubmissionForm({ onSuccess }: URLSubmissionFormProps)
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div>
-        <label htmlFor="url" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Website URL
         </label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Globe className="h-5 w-5 text-gray-400" />
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors">
+            <Globe className="h-5 w-5 text-gray-400 dark:text-gray-500 group-focus-within:text-primary-500 transition-colors" />
           </div>
           <input
             {...register('url', {
@@ -63,24 +63,24 @@ export default function URLSubmissionForm({ onSuccess }: URLSubmissionFormProps)
             })}
             type="url"
             id="url"
-            className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
+            className="block w-full pl-12 pr-4 py-3.5 glass-sm rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all"
             placeholder="https://example.com"
             disabled={isSubmitting}
           />
         </div>
         {errors.url && (
-          <p className="mt-1 text-sm text-red-600">{errors.url.message}</p>
+          <p className="mt-2 text-sm text-red-600 dark:text-red-400 animate-slide-down">{errors.url.message}</p>
         )}
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
           Analysis typically takes 30-60 seconds to complete.
         </p>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-primary-600 to-purple-600 text-white font-medium rounded-lg hover:from-primary-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary-500/50 dark:shadow-primary-500/30 hover:scale-105 hover:shadow-xl"
         >
           {isSubmitting ? (
             <>

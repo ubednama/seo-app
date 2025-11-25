@@ -123,11 +123,11 @@ export default function ReportPage({ params }: ReportPageProps) {
   return (
     <div className="max-w-6xl mx-auto space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="glass rounded-lg shadow-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <Link
             href="/"
-            className="inline-flex items-center text-primary-600 hover:text-primary-700 transition-colors"
+            className="inline-flex items-center text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
             Back to Dashboard
@@ -136,7 +136,7 @@ export default function ReportPage({ params }: ReportPageProps) {
             <button
               onClick={handleDownloadPdf}
               disabled={isDownloading}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+              className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-primary-700 hover:to-purple-700 transition-all shadow-lg hover:scale-105"
             >
               {isDownloading ? (
                 <>
@@ -152,7 +152,7 @@ export default function ReportPage({ params }: ReportPageProps) {
             </button>
             <div className="flex items-center space-x-2">
               {getStatusIcon(report.status)}
-              <span className="text-lg font-medium capitalize">
+              <span className="text-lg font-medium capitalize text-gray-900 dark:text-gray-100">
                 {report.status}
               </span>
             </div>
@@ -161,14 +161,14 @@ export default function ReportPage({ params }: ReportPageProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
               SEO Analysis Report
             </h1>
-            <div className="flex items-center text-gray-600 mb-4">
+            <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
               <ExternalLink className="h-5 w-5 mr-2" />
               <span className="break-all">{report.url}</span>
             </div>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               Generated on{" "}
               {format(new Date(report.created_at), "MMMM dd, yyyy at HH:mm")}
             </p>
@@ -177,10 +177,10 @@ export default function ReportPage({ params }: ReportPageProps) {
           <div className="flex items-center justify-center">
             {report.seo_score !== null ? (
               <div className="text-center">
-                <div className="text-6xl font-bold text-primary-600 mb-2">
+                <div className="text-6xl font-bold text-primary-600 dark:text-primary-400 mb-2">
                   {report.seo_score}
                 </div>
-                <div className="text-lg text-gray-600">SEO Score</div>
+                <div className="text-lg text-gray-600 dark:text-gray-400">SEO Score</div>
                 <SEOScore score={report.seo_score} size="large" showLabel />
               </div>
             ) : (
@@ -195,8 +195,8 @@ export default function ReportPage({ params }: ReportPageProps) {
 
       {/* Metrics Overview */}
       {report.load_time !== null && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             Performance Metrics
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -204,14 +204,14 @@ export default function ReportPage({ params }: ReportPageProps) {
               <div className="text-3xl font-bold text-blue-600 mb-2">
                 {report.load_time.toFixed(2)}s
               </div>
-              <div className="text-gray-600">Load Time</div>
+              <div className="text-gray-600 dark:text-gray-400">Load Time</div>
             </div>
             {report.accessibility_score !== null && (
               <div className="text-center">
                 <div className="text-3xl font-bold text-green-600 mb-2">
                   {report.accessibility_score.toFixed(0)}/100
                 </div>
-                <div className="text-gray-600">Accessibility</div>
+                <div className="text-gray-600 dark:text-gray-400">Accessibility</div>
               </div>
             )}
             {report.performance_score !== null && (
@@ -219,7 +219,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                 <div className="text-3xl font-bold text-purple-600 mb-2">
                   {report.performance_score.toFixed(0)}/100
                 </div>
-                <div className="text-gray-600">Performance</div>
+                <div className="text-gray-600 dark:text-gray-400">Performance</div>
               </div>
             )}
           </div>
@@ -229,8 +229,8 @@ export default function ReportPage({ params }: ReportPageProps) {
       {/* Content Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Title and Meta */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             Page Content
           </h3>
 
@@ -238,9 +238,9 @@ export default function ReportPage({ params }: ReportPageProps) {
             <div>
               <div className="flex items-center mb-2">
                 <Globe className="h-5 w-5 text-gray-400 mr-2" />
-                <span className="font-medium text-gray-700">Title</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Title</span>
               </div>
-              <p className="text-gray-600 bg-gray-50 p-3 rounded-lg">
+              <p className="text-gray-600 dark:text-gray-400 glass-sm p-3 rounded-lg">
                 {report.title || "No title found"}
               </p>
             </div>
@@ -248,11 +248,11 @@ export default function ReportPage({ params }: ReportPageProps) {
             <div>
               <div className="flex items-center mb-2">
                 <Hash className="h-5 w-5 text-gray-400 mr-2" />
-                <span className="font-medium text-gray-700">
+                <span className="font-medium text-gray-700 dark:text-gray-300">
                   Meta Description
                 </span>
               </div>
-              <p className="text-gray-600 bg-gray-50 p-3 rounded-lg">
+              <p className="text-gray-600 dark:text-gray-400 glass-sm p-3 rounded-lg">
                 {report.meta_description || "No meta description found"}
               </p>
             </div>
@@ -260,15 +260,15 @@ export default function ReportPage({ params }: ReportPageProps) {
         </div>
 
         {/* Headings */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             Headings Structure
           </h3>
 
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-700">H1 Tags</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">H1 Tags</span>
                 <span className="text-sm text-gray-500">
                   ({report.h1_tags?.length || 0})
                 </span>
@@ -277,7 +277,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                 {report.h1_tags?.map((tag, index) => (
                   <div
                     key={index}
-                    className="text-gray-600 bg-gray-50 p-2 rounded"
+                    className="text-gray-600 dark:text-gray-400 glass-sm p-2 rounded"
                   >
                     {tag}
                   </div>
@@ -287,7 +287,7 @@ export default function ReportPage({ params }: ReportPageProps) {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-gray-700">H2 Tags</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">H2 Tags</span>
                 <span className="text-sm text-gray-500">
                   ({report.h2_tags?.length || 0})
                 </span>
@@ -296,7 +296,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                 {report.h2_tags?.slice(0, 5).map((tag, index) => (
                   <div
                     key={index}
-                    className="text-gray-600 bg-gray-50 p-2 rounded"
+                    className="text-gray-600 dark:text-gray-400 glass-sm p-2 rounded"
                   >
                     {tag}
                   </div>
@@ -317,8 +317,8 @@ export default function ReportPage({ params }: ReportPageProps) {
 
       {/* Images and Links */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             Images ({report.images?.length || 0})
           </h3>
 
@@ -327,7 +327,7 @@ export default function ReportPage({ params }: ReportPageProps) {
               {report.images.slice(0, 5).map((image, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 glass-sm rounded-lg"
                 >
                   <div className="flex items-center">
                     <Image
@@ -335,10 +335,10 @@ export default function ReportPage({ params }: ReportPageProps) {
                       aria-label="Image icon"
                     />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                         {image.src.split("/").pop()}
                       </p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {image.alt ? "Has alt text" : "Missing alt text"}
                       </p>
                     </div>
@@ -361,8 +361,8 @@ export default function ReportPage({ params }: ReportPageProps) {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             Links ({report.links?.length || 0})
           </h3>
 
@@ -371,15 +371,15 @@ export default function ReportPage({ params }: ReportPageProps) {
               {report.links.slice(0, 5).map((link, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-3 glass-sm rounded-lg"
                 >
                   <div className="flex items-center min-w-0">
                     <LinkIcon className="h-5 w-5 text-gray-400 mr-3 flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                         {link.text || link.href}
                       </p>
-                      <p className="text-sm text-gray-500 truncate">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                         {link.href}
                       </p>
                     </div>
@@ -400,24 +400,24 @@ export default function ReportPage({ params }: ReportPageProps) {
 
       {/* AI Insights */}
       {isLoading ? (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             AI Insights
           </h3>
           <div className="space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-            <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-4/5 animate-pulse"></div>
           </div>
         </div>
       ) : (
         report.ai_insights && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">
+          <div className="glass rounded-lg shadow-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
               AI Insights
             </h3>
             <div className="prose max-w-none">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                 {report.ai_insights}
               </p>
             </div>
@@ -427,8 +427,8 @@ export default function ReportPage({ params }: ReportPageProps) {
 
       {/* AI Recommendations */}
       {report.ai_recommendations && report.ai_recommendations.length > 0 && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">
+        <div className="glass rounded-lg shadow-lg p-6">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
             AI Recommendations
           </h3>
           <div className="space-y-3">
@@ -437,7 +437,7 @@ export default function ReportPage({ params }: ReportPageProps) {
                 <div className="flex-shrink-0 w-6 h-6 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center text-sm font-medium">
                   {index + 1}
                 </div>
-                <div className="text-gray-700 leading-relaxed">
+                <div className="text-gray-700 dark:text-gray-300 leading-relaxed">
                   <ReactMarkdown>{recommendation}</ReactMarkdown>
                 </div>{" "}
               </div>

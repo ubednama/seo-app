@@ -3,35 +3,86 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Light mode colors */
+  --background: 249 250 251;
+  --foreground: 17 24 39;
+  --card: 255 255 255;
+  --card-foreground: 17 24 39;
+  --primary: 37 99 235;
+  --primary-foreground: 255 255 255;
+  --muted: 243 244 246;
+  --muted-foreground: 107 114 128;
+  --border: 229 231 235;
+  --input: 229 231 235;
+  --ring: 37 99 235;
+  
+  /* Gradients */
+  --gradient-start: 239 246 255;
+  --gradient-end: 219 234 254;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.dark {
+  /* Dark mode colors - Pitch Black Theme */
+  --background: 0 0 0;
+  --foreground: 255 255 255;
+  --card: 10 10 10;
+  --card-foreground: 255 255 255;
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --muted: 17 17 17;
+  --muted-foreground: 163 163 163;
+  --border: 30 30 30;
+  --input: 17 17 17;
+  --ring: 59 130 246;
+  
+  /* Gradients */
+  --gradient-start: 10 10 10;
+  --gradient-end: 0 0 0;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  @apply bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 dark:from-black dark:via-gray-950 dark:to-black text-gray-900 dark:text-gray-100;
+  font-feature-settings: "rlig" 1, "calt" 1;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Glassmorphism utilities */
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-gray-200/50 dark:border-gray-700/50;
+  }
+  
+  .glass-sm {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border border-gray-200/60 dark:border-gray-700/60;
+  }
+  
+  .glass-lg {
+    @apply bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl border border-gray-200/40 dark:border-gray-700/40;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 bg-clip-text text-transparent;
+  }
+  
+  .gradient-border {
+    @apply relative;
+    background: linear-gradient(var(--card), var(--card)) padding-box,
+                linear-gradient(135deg, rgb(var(--primary)), rgb(168 85 247), rgb(236 72 153)) border-box;
+    border: 2px solid transparent;
+  }
+}
+
+/* Animations */
 .animate-fade-in {
   animation: fadeIn 0.5s ease-in-out;
 }
 
 .animate-slide-up {
   animation: slideUp 0.3s ease-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
 }
 
 @keyframes fadeIn {
@@ -42,4 +93,32 @@ body {
 @keyframes slideUp {
   from { transform: translateY(10px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-600;
+}
+
+/* Focus visible improvements */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-500;
 }
